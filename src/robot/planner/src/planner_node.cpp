@@ -131,7 +131,7 @@ void PlannerNode::planningLoop() {
       int nidx = ny * width + nx;
       if (closed[nidx]) continue;
       int8_t occ = latest_map_.data[nidx];
-      if (occ >= 50) continue;
+      if (occ >= 70) continue;
       double step_cost = (std::abs(d.first) + std::abs(d.second) == 2) ? diag_cost : 1.0;
       double tentative_g = g_cost[cidx] + step_cost;
       if (tentative_g < g_cost[nidx]) {
