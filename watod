@@ -32,6 +32,10 @@ function run_compose {
     DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-1} docker compose --profile ${MODE_OF_OPERATION[@]}${MODULES[@]} "$@"
 }
 
+function print_foxglove_url {
+    echo "Foxglove websocket URL: ws://localhost:${FOXGLOVE_BRIDGE_PORT}"
+}
+
 # in case you need help
 if [ "$1" = 'help' ]; then
     usage
@@ -127,6 +131,9 @@ if [ ! -z "$COMPOSE_CMD" ]; then
     # If we are starting a terminal, run docker compose up with the -d argument
     if [ ! -z "$START_TERMINAL" ] && [[ ! " ${COMPOSE_CMD[@]} " =~ " -d " ]] && [[ " ${COMPOSE_CMD[@]} " =~ " up " ]]; then
         ADDITIONAL_ARGS="-d"
+    fi
+    if [[ " ${COMPOSE_CMD[@]} " =~ " up " ]] && [[ " ${ACTIVE_MODULES:-} " =~ " vis_tools " ]]; then
+        print_foxglove_url
     fi
     run_compose ${COMPOSE_CMD[@]} ${ADDITIONAL_ARGS}
 fi
