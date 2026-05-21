@@ -27,7 +27,7 @@ class CostmapNode : public rclcpp::Node {
     robot::CostmapCore costmap_;
     // Place these constructs here
     nav_msgs::msg::OccupancyGrid costmap_grid_;
-    int inflation_radius = 5; //meters
+    int inflation_radius = 3; //meters
     int maximum_cost = 100; // Max cost value for occupied cells/inflated cells
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr string_pub_;
     rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr map_pub_;
