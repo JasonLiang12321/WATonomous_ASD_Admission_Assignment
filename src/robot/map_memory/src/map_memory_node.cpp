@@ -71,12 +71,12 @@ MapMemoryNode::MapMemoryNode() : Node("map_memory"), map_memory_(robot::MapMemor
     "/costmap", 10, std::bind(&MapMemoryNode::mapCallback, this, std::placeholders::_1));
 
   // Publisher for the memory map
-  memory_map_pub_ = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/memory_map", rclcpp::QoS(1).transient_local());
+  memory_map_pub_ = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/map", rclcpp::QoS(1).transient_local());
 
   // Timer to periodically publish the memory map
   timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&MapMemoryNode::publishAndCalcMemory, this));
 
-  memory_map_.header.frame_id = "map";
+  memory_map_.header.frame_id = "sim_world";
   memory_map_.info.resolution = 0.1; // meters per cell
   memory_map_.info.width = 300;
   memory_map_.info.height = 300;
@@ -113,6 +113,7 @@ void MapMemoryNode::mapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr ms
 void MapMemoryNode::publishAndCalcMemory() {
   if (latest_map_.data.empty() || latest_map_.info.width == 0 || latest_map_.info.height == 0) {
     memory_map_.header.stamp = this->now();
+    memory_map_.header.frame_id = "sim_world";
     memory_map_pub_->publish(memory_map_);
     RCLCPP_DEBUG(this->get_logger(), "Published memory map without updates");
     return;
@@ -163,6 +164,7 @@ void MapMemoryNode::publishAndCalcMemory() {
 
   // Stamp and publish the current state of the memory map
   merged_map.header.stamp = this->now();
+  merged_map.header.frame_id = "sim_world";
   memory_map_ = merged_map;
   memory_map_pub_->publish(memory_map_);
   RCLCPP_DEBUG(this->get_logger(), "\n%s", renderMemoryMap(memory_map_).c_str());

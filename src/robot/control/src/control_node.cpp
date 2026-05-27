@@ -6,7 +6,7 @@
 ControlNode::ControlNode(): Node("control"), control_(robot::ControlCore(this->get_logger())) {
   // Subscribe to path topic
   path_sub_ = this->create_subscription<nav_msgs::msg::Path>(
-    "planned_path",
+    "/path",
     10,
     std::bind(&ControlNode::pathCallback, this, std::placeholders::_1)
   );

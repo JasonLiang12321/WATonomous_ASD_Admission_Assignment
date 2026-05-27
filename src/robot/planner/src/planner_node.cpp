@@ -17,7 +17,7 @@ PlannerNode::PlannerNode() : Node("planner"), planner_(robot::PlannerCore(this->
   );
 
   map_sub_ = this->create_subscription<nav_msgs::msg::OccupancyGrid>(
-    "memory_map",
+    "/map",
     10,
     std::bind(&PlannerNode::mapCallback, this, std::placeholders::_1)
   );
@@ -32,7 +32,7 @@ PlannerNode::PlannerNode() : Node("planner"), planner_(robot::PlannerCore(this->
     std::bind(&PlannerNode::planningLoop, this)
   );
 
-  path_pub_ = this->create_publisher<nav_msgs::msg::Path>("planned_path", 10);
+  path_pub_ = this->create_publisher<nav_msgs::msg::Path>("/path", 10);
 }
 void PlannerNode::goalCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg) {
   RCLCPP_INFO(this->get_logger(), "Received new goal: (%.2f, %.2f)", msg->point.x, msg->point.y);
@@ -43,6 +43,7 @@ void PlannerNode::goalCallback(const geometry_msgs::msg::PointStamped::SharedPtr
 void PlannerNode::mapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   RCLCPP_DEBUG(this->get_logger(), "Received new map: resolution=%.2f, width=%u, height=%u",
     msg->info.resolution, msg->info.width, msg->info.height);
+  map_frame_id_ = msg->header.frame_id.empty() ? std::string("map") : msg->header.frame_id;
   latest_map_ = *msg; // Store the latest map for planning
 }
 void PlannerNode::odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -163,7 +164,7 @@ void PlannerNode::planningLoop() {
   // build nav_msgs::msg::Path
   nav_msgs::msg::Path path_msg;
   path_msg.header.stamp = this->now();
-  path_msg.header.frame_id = latest_map_.header.frame_id.empty() ? std::string("map") : latest_map_.header.frame_id;
+  path_msg.header.frame_id = "sim_world";
   for (int idx : path_idx) {
     int gx = idx % width;
     int gy = idx / width;

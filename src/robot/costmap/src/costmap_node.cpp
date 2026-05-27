@@ -44,6 +44,7 @@ void CostmapNode::lidarCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg
   // - angle_increment: Angular distance between measurements (radians)
   // - ranges: Array of distance measurements (meters)
   costmap_grid_.data.assign(static_cast<size_t>(costmap_grid_.info.width) * static_cast<size_t>(costmap_grid_.info.height), 0);
+  costmap_grid_.header.frame_id = msg->header.frame_id.empty() ? std::string("robot/chassis/lidar") : msg->header.frame_id;
   
   RCLCPP_DEBUG(this->get_logger(), 
     "Received LaserScan: angle_min=%.2f, angle_max=%.2f, angle_increment=%.4f, ranges_size=%zu",
@@ -99,7 +100,7 @@ void CostmapNode::inflateObstacles() {
 void CostmapNode::updateCostMap(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
 
   // Stamp and ensure data buffer size
-    costmap_grid_.header.stamp = this->now();
+    costmap_grid_.header.stamp = msg->header.stamp;
     
     map_pub_->publish(costmap_grid_);
 

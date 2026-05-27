@@ -46,6 +46,7 @@ class PlannerNode : public rclcpp::Node {
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_sub_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
   nav_msgs::msg::OccupancyGrid latest_map_;
+  std::string map_frame_id_ = "map";
   bool waiting_for_goal_ = true;
   float goal_x_ = 0.0;
   float goal_y_ = 0.0;
